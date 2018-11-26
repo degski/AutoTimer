@@ -56,7 +56,7 @@ class AutoTimer {
 
     double * total_time = nullptr;
 
-    [[ nodiscard ]] double QueryFrequency ( ) noexcept {
+    [[ nodiscard ]] double query_frequency ( ) noexcept {
         LARGE_INTEGER performance_frequency;
         QueryPerformanceFrequency ( & performance_frequency );
         return static_cast<double> ( performance_frequency.QuadPart );
@@ -65,7 +65,7 @@ class AutoTimer {
 public:
 
     AutoTimer ( timer_precision _p = microseconds, double * total_time_ = nullptr, std::string _fs = " %.0f" ) noexcept :
-        frequency { QueryFrequency ( ) },
+        frequency { query_frequency ( ) },
         fs { _fs + ( _fs != "" ? precision_desc [ _p ] : "" ) },
         precision { _p },
         total_time { total_time_ } {
