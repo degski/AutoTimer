@@ -48,28 +48,30 @@ static const std::string precision_desc [ 9 ] { " years.\n", " days.\n", " hours
 
 class AutoTimer {
 
-    double frequency;
+    static constexpr double r [ ] = { 1.0 / 31557600.0, 1.0 / 86400.0, 1.0 / 3600.0, 1.0 / 60.0, 1.0, 1e3, 1e6, 1e9, 1e12 };
+
+    double period;
     std::string fs;
     timer_precision precision;
 
-    LARGE_INTEGER start, end;
+    LARGE_INTEGER begin, end;
 
     double * total_time = nullptr;
 
-    [[ nodiscard ]] double query_frequency ( ) noexcept {
+    [[ nodiscard ]] double query_period ( ) noexcept {
         LARGE_INTEGER performance_frequency;
         QueryPerformanceFrequency ( & performance_frequency );
-        return static_cast<double> ( performance_frequency.QuadPart );
+        return 1.0 / static_cast<double> ( performance_frequency.QuadPart );
     }
 
 public:
 
     AutoTimer ( timer_precision _p = microseconds, double * total_time_ = nullptr, std::string _fs = " %.0f" ) noexcept :
-        frequency { query_frequency ( ) },
+        period { query_period ( ) },
         fs { _fs + ( _fs != "" ? precision_desc [ _p ] : "" ) },
         precision { _p },
         total_time { total_time_ } {
-            QueryPerformanceCounter ( & start );
+            QueryPerformanceCounter ( & begin );
         }
 
     ~AutoTimer ( ) noexcept {
@@ -82,12 +84,28 @@ public:
         }
     }
 
+    void tic ( ) noexcept {
+        QueryPerformanceCounter ( & begin );
+    }
+
     [[ nodiscard ]] double toc ( ) noexcept {
-        static const double r [ ] = { 1.0 / 31557600.0, 1.0 / 86400.0, 1.0 / 3600.0, 1.0 / 60.0, 1.0, 1e3, 1e6, 1e9, 1e12 };
         QueryPerformanceCounter ( & end );
-        return ( static_cast<double> ( end.QuadPart - start.QuadPart ) / frequency ) * r [ precision ];
+        return ( static_cast<double> ( end.QuadPart - begin.QuadPart ) * period ) * r [ precision ];
+    }
+
+    void start ( ) noexcept {
+        QueryPerformanceCounter ( & begin );
+    }
+
+    [[ nodiscard ]] double restart ( ) noexcept {
+        QueryPerformanceCounter ( & end );
+        const double d { ( static_cast<double> ( end.QuadPart - begin.QuadPart ) * period ) * r [ precision ] };
+        QueryPerformanceCounter ( & begin );
+        return d;
     }
 };
+
+
 }
 
 #ifdef WIN32_LEAN_AND_MEAN_WAS_NOT_DEFINED
