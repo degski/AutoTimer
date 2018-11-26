@@ -48,7 +48,7 @@ static const std::string precision_desc [ 9 ] { " years.\n", " days.\n", " hours
 
 class AutoTimer {
 
-    static constexpr double r [ ] = { 1.0 / 31557600.0, 1.0 / 86400.0, 1.0 / 3600.0, 1.0 / 60.0, 1.0, 1e3, 1e6, 1e9, 1e12 };
+    static constexpr double r [ ] { 1.0 / 31557600.0, 1.0 / 86400.0, 1.0 / 3600.0, 1.0 / 60.0, 1.0, 1e3, 1e6, 1e9, 1e12 };
 
     double period;
     std::string fs;
