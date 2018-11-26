@@ -32,16 +32,20 @@
 #include "autotimer.hpp"
 
 
-void sleep ( const std::int32_t milliseconds_ ) noexcept {
+void sleep_ms ( const std::int32_t milliseconds_ ) noexcept {
     std::this_thread::sleep_for ( std::chrono::milliseconds ( milliseconds_ ) );
 }
 
 
+void sleep_us ( const std::int32_t microseconds_ ) noexcept {
+    std::this_thread::sleep_for ( std::chrono::microseconds ( microseconds_ ) );
+}
+
 int wmain ( ) {
 
     {
-        at::AutoTimer at { at::milliseconds };
-        sleep ( 100 );
+        at::AutoTimer at { at::microseconds };
+        sleep_us ( 10'000 );
     }
 
     return EXIT_SUCCESS;
